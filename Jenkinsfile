@@ -1,4 +1,4 @@
-def gitHubUser = "marvin-trezlabs"
+def gitHubUser = "nirgeier"
 def dockerHubUser = "marvintrezlabs"
 
 def repoScript = """import groovy.json.JsonSlurper
@@ -115,30 +115,30 @@ pipeline {
             }
         }
         
-        stage('Docker Build and Tag') {
-            steps {
-                dir(path: "${params.REPO}"){
-                    //BUilding the image
-                    sh "docker build -t ${params.REPO}:latest ."
-                    // TAggin the image to the latest and the current build tag
-                    sh "docker tag ${params.REPO} ${dockerHubUser}/${params.REPO}:latest"
-                    sh "docker tag ${params.REPO} ${dockerHubUser}/${params.REPO}:$BUILD_NUMBER"
-                }
-
-            }
-        }
-        stage('Publish image to Docker Hub') {
-            steps {
-                dir(path: "${params.REPO}"){
-                    //Using docker push plugin and dockerhub credentials, blank url for docker hub registry
-                    //Uses docker-pipeline plugin
-                    withDockerRegistry([credentialsId: "dockerHub", url: ""]) {
-                        //Pushing both (latest and build number image)
-                        sh "docker push ${dockerHubUser}/${params.REPO}:latest"
-                        sh "docker push ${dockerHubUser}/${params.REPO}:$BUILD_NUMBER"
-                    }
-                }
-            }
+ #       stage('Docker Build and Tag') {
+ #           steps {
+ #               dir(path: "${params.REPO}"){
+ #                   //BUilding the image
+ #                   sh "docker build -t ${params.REPO}:latest ."
+ #                   // TAggin the image to the latest and the current build tag
+ #                   sh "docker tag ${params.REPO} ${dockerHubUser}/${params.REPO}:latest"
+ #                   sh "docker tag ${params.REPO} ${dockerHubUser}/${params.REPO}:$BUILD_NUMBER"
+ #               }
+#
+ #           }
+#        }
+#        stage('Publish image to Docker Hub') {
+#            steps {
+#                dir(path: "${params.REPO}"){
+#                    //Using docker push plugin and dockerhub credentials, blank url for docker hub registry
+#                    //Uses docker-pipeline plugin
+#                    withDockerRegistry([credentialsId: "dockerHub", url: ""]) {
+#                        //Pushing both (latest and build number image)
+#                        sh "docker push ${dockerHubUser}/${params.REPO}:latest"
+#                        sh "docker push ${dockerHubUser}/${params.REPO}:$BUILD_NUMBER"
+#                    }
+ #               }
+#            }
 
         }
     }   
