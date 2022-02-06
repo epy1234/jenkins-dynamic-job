@@ -1,4 +1,4 @@
-def gitHubUser = "nirgeier"
+def gitHubUser = "epy1234"
 def dockerHubUser = "marvintrezlabs"
 
 def repoScript = """import groovy.json.JsonSlurper
