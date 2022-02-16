@@ -1,6 +1,6 @@
 
-def gitHubUser = "epy1234"
-//gitHubUser = "${params.gitUserName}"
+gitHubUser = "epy1234"
+gitHubUser = "${params.gitUserName}"
 
 pipeline {
     agent any
