@@ -2,15 +2,7 @@ gitUserName = ""
 gitHubUser = "${params.gitUserName}"
 REPO=""
 
-pipeline {
-    agent any
-
-    stages {
-        stage('echo pm'){
-            steps {
-                script {
-                    
-                   properties([parameters([string(defaultValue: 'epy1234', description: 'git user name', name: 'gitUserName'), [$class: 'CascadeChoiceParameter', choiceType: 'PT_SINGLE_SELECT', description: 'Select the Repository from the Dropdown List', filterLength: 1, filterable: false, name: 'REPO', randomName: 'choice-parameter-18506770003900', referencedParameters: 'gitUserName', script: [$class: 'GroovyScript', fallbackScript: [classpath: [], sandbox: false, script: 'return[\'Could not get The Repos\']'], script: [classpath: [], sandbox: false, script: '''import groovy.json.JsonSlurper
+def repoScript = '''import groovy.json.JsonSlurper
 def get = new URL("https://api.github.com/users/${gitUserName}/repos").openConnection();
 def getRC = get.getResponseCode();
 if (getRC.equals(200)) {
@@ -24,7 +16,9 @@ if (getRC.equals(200)) {
     }   
     return names;
     
-}''']]], [$class: 'CascadeChoiceParameter', choiceType: 'PT_SINGLE_SELECT', description: 'Select the Branch from the Dropdown List', filterLength: 1, filterable: false, name: 'BRANCH', randomName: 'choice-parameter-18506776678100', referencedParameters: 'REPO,gitUserName', script: [$class: 'GroovyScript', fallbackScript: [classpath: [], sandbox: false, script: 'return[\'Could not get Branch from the Repo\']'], script: [classpath: [], sandbox: false, script: '''import groovy.json.JsonSlurper
+}'''
+
+def branchScript = '''import groovy.json.JsonSlurper
 def getBranches = new URL("https://api.github.com/repos/${gitUserName}/" + REPO + "/branches").openConnection();
 def getRCBranches = getBranches.getResponseCode();
 if (getRCBranches.equals(200)) {
@@ -37,7 +31,42 @@ if (getRCBranches.equals(200)) {
         namesBr.push(branch.name);
     } 
     return namesBr;
-}''']]]])])
+}'''
+
+
+pipeline {
+    agent any
+
+    stages {
+        stage('echo pm'){
+            steps {
+                script {
+                    
+                   properties([parameters([string(defaultValue: 'epy1234',
+                   description: 'git user name', name: 'gitUserName'),
+                   [$class: 'CascadeChoiceParameter',
+                   choiceType: 'PT_SINGLE_SELECT',
+                   description: 'Select the Repository from the Dropdown List',
+                   filterLength: 1, filterable: false, name: 'REPO', randomName: 'choice-parameter-18506770003900',
+                   referencedParameters: 'gitUserName',
+                   script: [$class: 'GroovyScript',
+                   fallbackScript: [classpath: [],
+                   sandbox: false,
+                   script: 'return[\'Could not get The Repos\']'],
+                   script: [classpath: [], sandbox: false,
+                   script: "${repoScript}"
+                   ]]],
+                   [$class: 'CascadeChoiceParameter',
+                   choiceType: 'PT_SINGLE_SELECT',
+                   description: 'Select the Branch from the Dropdown List',
+                   filterLength: 1, filterable: false, name: 'BRANCH', randomName: 'choice-parameter-18506776678100',
+                   referencedParameters: 'REPO,gitUserName',
+                   script: [$class: 'GroovyScript',
+                   fallbackScript: [classpath: [],
+                   sandbox: false,
+                   script: 'return[\'Could not get Branch from the Repo\']'],
+                   script: [classpath: [], sandbox: false,
+                   script: "${branchScript}"]]]])])
                 }
             
                 echo "gitUserName is:"
